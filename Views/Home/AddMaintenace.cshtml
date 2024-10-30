@@ -1,0 +1,165 @@
+﻿@{
+    ViewData["Title"] = "Maintenace";
+
+}
+<h1 id="reportTitle">Add Maintenance Record</h1>
+<br />
+@model VehicleMaintenanceSystem.Models.VehicleMaintenanceViewModel
+@Html.ValidationSummary(true)
+<div class="card" style="margin-top: 20px;">
+    <div class="card-header" style="background-color: #0565B7;color:white">
+        <h3 class="card-title">Maintenance Information:</h3>
+    </div>
+    <div class="card-body">
+        <!-- Render the dropdown list with TicketCatType data -->
+
+        <div class="row">
+            <div class="col-md-auto col-12 col-lg-4">
+                <div class="form-group">
+                    <label for="mainType">Maintenance Type:</label>
+                    <input type="text" id="txtmainType" name="mainType" class="form-control" placeholder="Enter Maintenace Type">
+                    <span class="text-danger" id="mainTypeError" style="display: none;">Please Enter Maintenace Type</span>
+                </div>
+            </div>
+            <div class="col-md-auto col-12 col-lg-4">
+                <div class="form-group">
+                    <label for="mainDate">Maintenance Date:</label>
+
+                    <input type="date" id="txtmainDate" name="mainDate" class="form-control" >
+                    <span class="text-danger" id="mainDateError" style="display: none;">Please Enter Maintenance Date</span>
+                </div>
+            </div>
+
+            <div class="col-md-auto col-12 col-lg-4">
+                <label for="vehicleDd">Vehicle:</label>
+                <select class="form-control" id="VehicleDropdown" name="vehicleDd">
+                    <option value="">Select Vehicle</option>
+                    @foreach (System.Data.DataRow catRow in Model.Vehicles.Tables[0].Rows)
+                    {
+
+                        <option value="0">Select Vehicle</option>
+                        <option value="@catRow["VehicleId"]">@catRow["VehicleModel"]</option>
+
+                    }
+                </select>
+
+                <span class="text-danger" id="vehicleDropdownError" style="display: none;">Please select Vehicle.</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-auto col-12 col-lg-4">
+                <div class="form-group">
+                    <label for="mainDescription">Maintenance Description:</label>
+
+                    <input type="text" id="txtmainDescription" name="mainDescription" class="form-control" placeholder="Enter Maintenance Description">
+                    <span class="text-danger" id="mainDescriptionError" style="display: none;">Please Enter Maintenance Description</span>
+                </div>
+            </div>
+
+            <div class="col-md-auto col-12 col-lg-4">
+                <div class="form-group">
+                    <label for="mainNotes">Maintenance Notes:</label>
+
+                    <input type="text" id="txtmainNotes" name="mainNotes" class="form-control" placeholder="Enter Maintenance Notes">
+                    <span class="text-danger" id="mainNotesError" style="display: none;">Please Enter Maintenance Notes</span>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="row">
+            <div class="col-md-auto col-12">
+                <button class="btn btn-success float-Right" id="btnCreateMaintenance">Create Maintenance</button>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+       
+        $('#btnCreateMaintenance').click(function () {
+            debugger
+            var mainType = $('#txtmainType').val();
+            var mainDate = $('#txtmainDate').val();
+            var vehicleId = $('#VehicleDropdown option:selected').val();;
+            var mainDescription = $('#txtmainDescription').val();
+            var mainNotes = $('#txtmainNotes').val();
+           
+            debugger
+          
+            if (mainType === '') {
+                $('#mainTypeError').show();
+                return false; 
+            } else {
+                $('#mainTypeError').hide();
+            }
+            if (mainDate === '') {
+                $('#mainDateError').show();
+                return false;
+            } else {
+                $('#mainDateError').hide();
+            }
+            if (vehicleId === '0') {
+                $('#vehicleDropdownError').show();
+                return false; 
+            } else {
+                $('#vehicleDropdownError').hide();
+            }
+            if (mainDescription === '') {
+                $('#mainDescriptionError').show();
+                return false;
+            } else {
+                $('#mainDescriptionError').hide();
+            }
+            if (mainNotes === '') {
+                $('#mainNotesError').show();
+                return false;
+            } else {
+                $('#mainNotesError').hide();
+            }
+          
+
+            debugger
+            var CreateMaintenanceData = {
+
+                mainType: mainType,
+                mainDate: mainDate,
+                vehicleId: vehicleId,
+                mainDescription: mainDescription,
+                mainNotes: mainNotes,
+
+            };
+            debugger
+            $.ajax({
+                url: '/Home/CreateMaintenace',
+                type: 'POST',
+                data: CreateMaintenanceData,
+                success: function (response) {
+                    debugger                
+                    if (response.success) {                    
+                        Swal.fire('Success', response.message, 'success');
+                        var ticketno = response.data;
+                        $('#txtmainType').val('');
+                        $('#txtmainDate').val('');
+                        $('#VehicleDropdown').val('0');
+                        $('#txtmainDescription').val('');
+                        $('#txtmainNotes').val('');
+                    }
+                    else {
+                  
+                        Swal.fire('Error', response.message, 'Error');
+                    }
+                },
+                error: function (xhr, status, error) {
+                  
+                    Swal.fire('Error', 'Error Creating Maintenace: ' + error, 'error');
+                }
+            });
+        });
+
+        
+    });
+</script>
